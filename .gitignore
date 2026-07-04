@@ -1,0 +1,23 @@
+# secrets — NEVER track (.env.example IS tracked as the template)
+.env
+*.key
+
+# heavy / generated data
+data/
+hf_cache/
+eval/reports/
+qdrant_storage/
+
+# python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+dist/
+*.egg-info/
+
+# notebooks
+.ipynb_checkpoints/
+
+# machine-local tool settings
+.claude/settings.local.json
