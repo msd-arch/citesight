@@ -158,11 +158,20 @@ class QwenVlAnswerer:
 
         self._ensure_loaded()
         prompt = build_prompt(question, len(page_images), extra_context)
+        # Cap image resolution HERE (in the message), so qwen_vl_utils'
+        # process_vision_info downscales each page to the visual-token budget.
+        # The processor-level max_pixels does NOT reliably propagate to the image
+        # processor on transformers 4.51, which let full-res pages (~3M px, ~12k
+        # patches) into the vision tower and OOM'd its attention on a T4.
+        max_px = self.settings.vlm_max_visual_tokens * 28 * 28
         messages = [
             {
                 "role": "user",
                 "content": [
-                    *({"type": "image", "image": img} for img in page_images),
+                    *(
+                        {"type": "image", "image": img, "max_pixels": max_px}
+                        for img in page_images
+                    ),
                     {"type": "text", "text": prompt},
                 ],
             }
